@@ -1,1 +1,2 @@
-Goal : To build a SoapUI equivalent for Apache Thrift services
+Goal : 
+To build a SoapUI equivalent for Apache Thrift services
