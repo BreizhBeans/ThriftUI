@@ -22,12 +22,11 @@ public class ThriftAnalyzer {
     /**
      * As the name implies, return an object with every type of thrift member
      *
-     * @param jar
-     * @return
+     * @param jar a jar file containing the thrift generated classes
+     * @return a ParsedThrift objectwith the services, structures and exceptions found in the jar
      * @throws ClassNotFoundException
-     * @throws NoSuchMethodException
      */
-    public static ParsedThrift findClassesInJar(JarFile jar) throws ClassNotFoundException, NoSuchMethodException {
+    public static ParsedThrift findClassesInJar(JarFile jar) throws ClassNotFoundException {
         ParsedThrift parsedThrift = new ParsedThrift();
 
         // open jar, get every directory (package)

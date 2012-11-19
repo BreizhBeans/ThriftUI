@@ -11,9 +11,9 @@ import java.util.HashMap;
  */
 public class ParsedThrift {
 
-    public HashMap<String, Class<?>> structures;
-    public HashMap<String, Class<?>> services;
-    public HashMap<String, Class<?>> exceptions;
+    public final HashMap<String, Class<?>> structures;
+    public final HashMap<String, Class<?>> services;
+    public final HashMap<String, Class<?>> exceptions;
     public String namespace;
 
     public ParsedThrift() {
@@ -26,7 +26,7 @@ public class ParsedThrift {
 
     @Override
     public String toString() {
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
 
         result.append("{namespace:");
         if (this.namespace != null) {

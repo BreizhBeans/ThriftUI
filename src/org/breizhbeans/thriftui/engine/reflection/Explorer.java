@@ -30,7 +30,6 @@ public class Explorer {
 
         // Create an dummy instance of every thrift structure found
         // and store it in a big fat map
-        String namespace = parsedThrift.namespace;
         HashMap<String, Object> structures = getStructures(parsedThrift);
 
 
@@ -119,7 +118,7 @@ public class Explorer {
         for (Class classe : classes) {
             if ("Client".equalsIgnoreCase(classe.getSimpleName())) {
                 Constructor<?> constructor = classe.getConstructor(protocol.getClass().getSuperclass());
-                client = constructor.newInstance(new Object[]{protocol});
+                client = constructor.newInstance(protocol);
                 break;
             }
         }
@@ -130,7 +129,7 @@ public class Explorer {
     /**
      * Create a default instance of every structure discovered in the thrift classes
      *
-     * @param parsedThrift
+     * @param parsedThrift the container of evrything discovered in the thrift generated classes.
      * @return an HashMap with key = structure name and value = structure default instance.
      * @throws InstantiationException
      * @throws IllegalAccessException
@@ -158,8 +157,7 @@ public class Explorer {
 
             // Then, instantiate the structure
             Constructor constructor = structure.getConstructor(constructorParameters);
-            Object instance = null;
-            instance = constructor.newInstance(defaults);
+            Object instance = constructor.newInstance(defaults);
             result.put(key, instance);
         }
 

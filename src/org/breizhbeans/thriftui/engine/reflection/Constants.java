@@ -7,15 +7,16 @@ package org.breizhbeans.thriftui.engine.reflection;
  * Time: 21:54
  * To change this template use File | Settings | File Templates.
  */
+@SuppressWarnings({"WeakerAccess", "UnusedDeclaration", "SameReturnValue"})
 public class Constants {
 
-    public static boolean DEFAULT_BOOL = true;
-    public static byte DEFAULT_BYTE = 8;
-    public static short DEFAULT_I16 = 16;
-    public static int DEFAULT_I32 = 32;
-    public static long DEFAULT_I64 = 64;
-    public static double DEFAULT_DOUBLE = 64.64;
-    public static String DEFAULT_STRING = "DefaultString";
+    public static final boolean DEFAULT_BOOL = true;
+    public static final byte DEFAULT_BYTE = 8;
+    public static final short DEFAULT_I16 = 16;
+    public static final int DEFAULT_I32 = 32;
+    public static final long DEFAULT_I64 = 64;
+    public static final double DEFAULT_DOUBLE = 64.64;
+    public static final String DEFAULT_STRING = "DefaultString";
 
 
     // Those "if" conditions are pretty ugly,
