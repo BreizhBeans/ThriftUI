@@ -1,0 +1,167 @@
+package org.breizhbeans.thriftui.engine.reflection; /**
+ * Created with IntelliJ IDEA.
+ * User: Pascal.Lombard
+ * Date: 11/11/12
+ * Time: 21:40
+ * To change this template use File | Settings | File Templates.
+ */
+
+import org.apache.thrift.protocol.TBinaryProtocol;
+import org.apache.thrift.protocol.TProtocol;
+import org.apache.thrift.transport.TSocket;
+import org.apache.thrift.transport.TTransport;
+import org.apache.thrift.transport.TTransportException;
+
+import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.jar.JarFile;
+
+public class Explorer {
+
+    public static void main(String[] args)
+            throws IOException, ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InstantiationException, InvocationTargetException {
+        // Open the .jar
+        // Extract the thrift structures+exceptions+services
+        ParsedThrift parsedThrift = ThriftAnalyzer.findClassesInJar(new JarFile(args[0]));
+
+        // Create an dummy instance of every thrift structure found
+        // and store it in a big fat map
+        String namespace = parsedThrift.namespace;
+        HashMap<String, Object> structures = getStructures(parsedThrift);
+
+
+        //TODO 4 : For each service, create a dummy server (for the moment it needs a server running)
+        //TODO 5 : For each service, create a dummy client
+
+        for (String key : parsedThrift.services.keySet()) {
+
+            // Preparation du protocol pour invocation
+            TTransport transport;
+            transport = new TSocket("localhost", 9090);
+            try {
+                transport.open();
+
+                TProtocol protocol = new TBinaryProtocol(transport);
+
+                Class<?> serviceClass = parsedThrift.services.get(key);
+                Object client = getClient(serviceClass, protocol);
+
+                for (Method method : client.getClass().getDeclaredMethods()) {
+                    // for each method, retrieve its parameters
+                    // and invoke with default values
+                    System.out.println("Method :" + method.getName());
+                    if (method.getName().startsWith("send_")
+                            || method.getName().startsWith("recv_")
+                            || method.getName().equalsIgnoreCase("Client")) {
+                        continue;
+                    }
+
+                    Class<?>[] parameters = method.getParameterTypes();
+                    int arraySize = parameters.length;
+                    Object[] defaults = new Object[arraySize];
+                    int i = 0;
+                    for (Class<?> parameter : parameters) {
+                        // if the parameter is a thrift structure,
+                        // we're likely to have it in our Map
+                        if (structures.containsKey(parameter.getSimpleName())) {
+                            defaults[i] = structures.get(parameter.getSimpleName());
+                        } else {
+                            // or it is a base type
+                            defaults[i] = Constants.getDefault(parameter);
+                        }
+                        // or... we're screwed with the current org.breizhbeans.thriftui.engine.reflection.Constants.getDefault().
+                        // TODO : unscrew ourselves.
+                        i++;
+                    }
+
+                    method.invoke(client, defaults);
+                }
+
+            } catch (TTransportException e) {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            } catch (NoSuchMethodException e) {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            } catch (InvocationTargetException e) {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            } catch (InstantiationException e) {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            } finally {
+                transport.close();
+            }
+        }
+
+
+    }
+
+    /**
+     * Mince, il n'y aurait pas un moyen plus simple et élégant de faire ça ?
+     *
+     * @param serviceClass a Thrift Service Class
+     * @param protocol     an instance of a TProtocol
+     * @return An instance of the Client class to the Service, using the protocol
+     * @throws NoSuchMethodException
+     * @throws InvocationTargetException
+     * @throws IllegalAccessException
+     * @throws InstantiationException
+     */
+    private static Object getClient(Class<?> serviceClass, TProtocol protocol)
+            throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, InstantiationException {
+        Class[] classes = serviceClass.getClasses();
+        Object client = null;
+
+        for (Class classe : classes) {
+            if ("Client".equalsIgnoreCase(classe.getSimpleName())) {
+                Constructor<?> constructor = classe.getConstructor(protocol.getClass().getSuperclass());
+                client = constructor.newInstance(new Object[]{protocol});
+                break;
+            }
+        }
+
+        return client;
+    }
+
+    /**
+     * Create a default instance of every structure discovered in the thrift classes
+     *
+     * @param parsedThrift
+     * @return an HashMap with key = structure name and value = structure default instance.
+     * @throws InstantiationException
+     * @throws IllegalAccessException
+     * @throws NoSuchMethodException
+     * @throws InvocationTargetException
+     */
+    private static HashMap<String, Object> getStructures(ParsedThrift parsedThrift)
+            throws InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+        HashMap<String, Object> result = new HashMap<String, Object>();
+
+        for (String key : parsedThrift.structures.keySet()) {
+            Class<?> structure = parsedThrift.structures.get(key);
+            // First, find the structure's fields
+            int arraySize = structure.getFields().length - 1; // expected number of fields, minus metadataMap
+            Object[] defaults = new Object[arraySize];
+            Class<?>[] constructorParameters = new Class<?>[arraySize];
+            int i = 0; // let's party like it's 1994 !
+            for (Field field : structure.getFields()) {
+                if (!"metaDataMap".equalsIgnoreCase(field.getName())) {
+                    defaults[i] = Constants.getDefault(field.getType());
+                    constructorParameters[i] = field.getType();
+                    i++;
+                }
+            }
+
+            // Then, instantiate the structure
+            Constructor constructor = structure.getConstructor(constructorParameters);
+            Object instance = null;
+            instance = constructor.newInstance(defaults);
+            result.put(key, instance);
+        }
+
+        return result;
+    }
+}
