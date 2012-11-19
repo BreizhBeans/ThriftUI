@@ -35,7 +35,8 @@ public class Explorer {
 
 
         //TODO 4 : For each service, create a dummy server (for the moment it needs a server running)
-        //TODO 5 : For each service, create a dummy client
+        // For each service found, create a dummy client
+        // and invoke their methods
 
         for (String key : parsedThrift.services.keySet()) {
 
