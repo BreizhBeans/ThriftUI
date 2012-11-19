@@ -1,6 +1,6 @@
 package org.breizhbeans.thriftui.engine.reflection;
 
-import org.breizhbeans.thriftui.engine.reflection.org.breizhbeans.thriftui.engine.reflection.bean.ParsedThrift;
+import org.breizhbeans.thriftui.engine.reflection.bean.ParsedThrift;
 
 import java.util.Enumeration;
 import java.util.jar.JarEntry;

@@ -1,7 +1,7 @@
 package test.org.breizhbeans.thriftui.engine.reflection;
 
 import junit.framework.TestCase;
-import org.breizhbeans.thriftui.engine.reflection.org.breizhbeans.thriftui.engine.reflection.bean.ParsedThrift;
+import org.breizhbeans.thriftui.engine.reflection.bean.ParsedThrift;
 import org.breizhbeans.thriftui.engine.reflection.ThriftAnalyzer;
 
 import java.util.jar.JarFile;

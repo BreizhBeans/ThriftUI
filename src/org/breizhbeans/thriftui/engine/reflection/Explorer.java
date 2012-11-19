@@ -11,7 +11,7 @@ import org.apache.thrift.protocol.TProtocol;
 import org.apache.thrift.transport.TSocket;
 import org.apache.thrift.transport.TTransport;
 import org.apache.thrift.transport.TTransportException;
-import org.breizhbeans.thriftui.engine.reflection.org.breizhbeans.thriftui.engine.reflection.bean.ParsedThrift;
+import org.breizhbeans.thriftui.engine.reflection.bean.ParsedThrift;
 
 import java.io.IOException;
 import java.lang.reflect.Constructor;

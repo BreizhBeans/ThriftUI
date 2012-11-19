@@ -1,4 +1,4 @@
-package org.breizhbeans.thriftui.engine.reflection.org.breizhbeans.thriftui.engine.reflection.bean;
+package org.breizhbeans.thriftui.engine.reflection.bean;
 
 import java.util.HashMap;
 
