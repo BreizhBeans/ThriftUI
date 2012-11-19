@@ -11,6 +11,7 @@ import org.apache.thrift.protocol.TProtocol;
 import org.apache.thrift.transport.TSocket;
 import org.apache.thrift.transport.TTransport;
 import org.apache.thrift.transport.TTransportException;
+import org.breizhbeans.thriftui.engine.reflection.org.breizhbeans.thriftui.engine.reflection.bean.ParsedThrift;
 
 import java.io.IOException;
 import java.lang.reflect.Constructor;
@@ -32,14 +33,14 @@ public class Explorer {
         // and store it in a big fat map
         HashMap<String, Object> structures = getStructures(parsedThrift);
 
-
         //TODO 4 : For each service, create a dummy server (for the moment it needs a server running)
+
         // For each service found, create a dummy client
         // and invoke their methods
 
         for (String key : parsedThrift.services.keySet()) {
 
-            // Preparation du protocol pour invocation
+            // Preparing the protocol for invocation
             TTransport transport;
             transport = new TSocket("localhost", 9090);
             try {
@@ -52,8 +53,9 @@ public class Explorer {
 
                 for (Method method : client.getClass().getDeclaredMethods()) {
                     // for each method, retrieve its parameters
-                    // and invoke with default values
-                    System.out.println("Method :" + method.getName());
+                    // and invoke with default values.
+                    // Note that send_, recv_ and Client methods are
+                    // of no interest here (thrift internal plumbering).
                     if (method.getName().startsWith("send_")
                             || method.getName().startsWith("recv_")
                             || method.getName().equalsIgnoreCase("Client")) {

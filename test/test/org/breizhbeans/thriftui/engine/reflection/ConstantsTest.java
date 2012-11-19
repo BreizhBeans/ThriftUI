@@ -1,3 +1,5 @@
+package test.org.breizhbeans.thriftui.engine.reflection;
+
 import junit.framework.TestCase;
 import org.breizhbeans.thriftui.engine.reflection.Constants;
 
