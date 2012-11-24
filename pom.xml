@@ -24,6 +24,7 @@
             <artifactId>libthrift</artifactId>
             <version>0.9.0</version>
         </dependency>
+        <!-- Jar used for the tests, don't freak out -->
         <dependency>
             <groupId>org.breizhbeans.thriftui</groupId>
             <artifactId>storage</artifactId>

@@ -5,6 +5,7 @@ package org.breizhbeans.thriftui.engine.reflection; /**
  * Time: 21:40
  */
 
+import org.apache.thrift.TServiceClient;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.protocol.TProtocol;
 import org.apache.thrift.transport.TSocket;
@@ -34,9 +35,9 @@ public class Explorer {
 
         //TODO 4 : For each service, create a dummy server (for the moment it needs a server running)
 
+
         // For each service found, create a dummy client
         // and invoke their methods
-
         for (String key : parsedThrift.services.keySet()) {
 
             // Preparing the protocol for invocation
@@ -48,39 +49,8 @@ public class Explorer {
                 TProtocol protocol = new TBinaryProtocol(transport);
 
                 Class<?> serviceClass = parsedThrift.services.get(key);
-                Object client = getClient(serviceClass, protocol);
-
-                for (Method method : client.getClass().getDeclaredMethods()) {
-                    // for each method, retrieve its parameters
-                    // and invoke with default values.
-                    // Note that send_, recv_ and Client methods are
-                    // of no interest here (thrift internal plumbering).
-                    if (method.getName().startsWith("send_")
-                            || method.getName().startsWith("recv_")
-                            || method.getName().equalsIgnoreCase("Client")) {
-                        continue;
-                    }
-
-                    Class<?>[] parameters = method.getParameterTypes();
-                    int arraySize = parameters.length;
-                    Object[] defaults = new Object[arraySize];
-                    int i = 0;
-                    for (Class<?> parameter : parameters) {
-                        // if the parameter is a thrift structure,
-                        // we're likely to have it in our Map
-                        if (structures.containsKey(parameter.getSimpleName())) {
-                            defaults[i] = structures.get(parameter.getSimpleName());
-                        } else {
-                            // or it is a base type
-                            defaults[i] = Constants.getDefault(parameter);
-                        }
-                        // or... we're screwed with the current org.breizhbeans.thriftui.engine.reflection.Constants.getDefault().
-                        // TODO : unscrew ourselves.
-                        i++;
-                    }
-
-                    method.invoke(client, defaults);
-                }
+                TServiceClient client = getClient(serviceClass, protocol);
+                runClient(client, structures);
 
             } catch (TTransportException e) {
                 e.printStackTrace();
@@ -101,6 +71,49 @@ public class Explorer {
     }
 
     /**
+     * For each method of the client which *looks like* a service invocation,
+     * get the necessary instances in the structures map and fire the invoke.
+     *
+     * @param client     the client to explore
+     * @param structures the ParsedThrift structures to use
+     * @throws IllegalAccessException
+     * @throws InvocationTargetException
+     */
+    private static void runClient(TServiceClient client, HashMap<String, Object> structures) throws IllegalAccessException, InvocationTargetException {
+        for (Method method : client.getClass().getDeclaredMethods()) {
+            // for each method, retrieve its parameters
+            // and invoke with default values.
+            // Note that send_, recv_ and Client methods are
+            // of no interest here (thrift internal plumbering).
+            if (method.getName().startsWith("send_")
+                    || method.getName().startsWith("recv_")
+                    || method.getName().equalsIgnoreCase("Client")) {
+                continue;
+            }
+
+            Class<?>[] parameters = method.getParameterTypes();
+            int arraySize = parameters.length;
+            Object[] defaults = new Object[arraySize];
+            int i = 0;
+            for (Class<?> parameter : parameters) {
+                // if the parameter is a thrift structure,
+                // we're likely to have it in our Map
+                if (structures.containsKey(parameter.getSimpleName())) {
+                    defaults[i] = structures.get(parameter.getSimpleName());
+                } else {
+                    // or it is a base type
+                    defaults[i] = Constants.getDefault(parameter);
+                }
+                // or... we're screwed with the current org.breizhbeans.thriftui.engine.reflection.Constants.getDefault().
+                // TODO : unscrew ourselves.
+                i++;
+            }
+
+            method.invoke(client, defaults);
+        }
+    }
+
+    /**
      * Mince, il n'y aurait pas un moyen plus simple et élégant de faire ça ?
      *
      * @param serviceClass a Thrift Service Class
@@ -111,15 +124,15 @@ public class Explorer {
      * @throws IllegalAccessException
      * @throws InstantiationException
      */
-    private static Object getClient(Class<?> serviceClass, TProtocol protocol)
+    private static TServiceClient getClient(Class<?> serviceClass, TProtocol protocol)
             throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, InstantiationException {
         Class[] classes = serviceClass.getClasses();
-        Object client = null;
+        TServiceClient client = null;
 
         for (Class classe : classes) {
             if ("Client".equalsIgnoreCase(classe.getSimpleName())) {
                 @SuppressWarnings("unchecked")
-                Constructor<?> constructor = classe.getConstructor(protocol.getClass().getSuperclass());
+                Constructor<TServiceClient> constructor = classe.getConstructor(protocol.getClass().getSuperclass());
                 client = constructor.newInstance(protocol);
                 break;
             }
