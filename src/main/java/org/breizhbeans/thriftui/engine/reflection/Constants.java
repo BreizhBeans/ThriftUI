@@ -5,7 +5,6 @@ package org.breizhbeans.thriftui.engine.reflection;
  * User: Pascal.Lombard
  * Date: 18/11/12
  * Time: 21:54
- * To change this template use File | Settings | File Templates.
  */
 @SuppressWarnings({"WeakerAccess", "UnusedDeclaration", "SameReturnValue"})
 public class Constants {

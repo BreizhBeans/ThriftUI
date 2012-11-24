@@ -3,11 +3,11 @@ package org.breizhbeans.thriftui.engine.reflection.bean;
 import java.util.HashMap;
 
 /**
- * Created with IntelliJ IDEA.
+ * Container class for the parsed thrift package/jar.
+ * <p/>
  * User: Pascal.Lombard
  * Date: 18/11/12
  * Time: 00:15
- * To change this template use File | Settings | File Templates.
  */
 public class ParsedThrift {
 

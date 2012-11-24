@@ -3,7 +3,6 @@ package org.breizhbeans.thriftui.engine.reflection; /**
  * User: Pascal.Lombard
  * Date: 11/11/12
  * Time: 21:40
- * To change this template use File | Settings | File Templates.
  */
 
 import org.apache.thrift.protocol.TBinaryProtocol;
@@ -84,15 +83,15 @@ public class Explorer {
                 }
 
             } catch (TTransportException e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                e.printStackTrace();
             } catch (NoSuchMethodException e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                e.printStackTrace();
             } catch (InvocationTargetException e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                e.printStackTrace();
             } catch (InstantiationException e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                e.printStackTrace();
             } catch (IllegalAccessException e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                e.printStackTrace();
             } finally {
                 transport.close();
             }
@@ -119,6 +118,7 @@ public class Explorer {
 
         for (Class classe : classes) {
             if ("Client".equalsIgnoreCase(classe.getSimpleName())) {
+                @SuppressWarnings("unchecked")
                 Constructor<?> constructor = classe.getConstructor(protocol.getClass().getSuperclass());
                 client = constructor.newInstance(protocol);
                 break;

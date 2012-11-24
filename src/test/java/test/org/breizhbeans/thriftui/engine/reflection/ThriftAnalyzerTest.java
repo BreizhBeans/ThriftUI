@@ -1,8 +1,8 @@
 package test.org.breizhbeans.thriftui.engine.reflection;
 
 import junit.framework.TestCase;
-import org.breizhbeans.thriftui.engine.reflection.bean.ParsedThrift;
 import org.breizhbeans.thriftui.engine.reflection.ThriftAnalyzer;
+import org.breizhbeans.thriftui.engine.reflection.bean.ParsedThrift;
 
 import java.util.jar.JarFile;
 
@@ -11,7 +11,6 @@ import java.util.jar.JarFile;
  * User: Pascal.Lombard
  * Date: 18/11/12
  * Time: 16:25
- * To change this template use File | Settings | File Templates.
  */
 public class ThriftAnalyzerTest extends TestCase {
     public void testFindClassesInJar() throws Exception {

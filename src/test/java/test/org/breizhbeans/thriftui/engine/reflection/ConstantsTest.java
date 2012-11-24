@@ -4,11 +4,9 @@ import junit.framework.TestCase;
 import org.breizhbeans.thriftui.engine.reflection.Constants;
 
 /**
- * Created with IntelliJ IDEA.
  * User: Pascal.Lombard
  * Date: 18/11/12
  * Time: 22:19
- * To change this template use File | Settings | File Templates.
  */
 public class ConstantsTest extends TestCase {
     public void testGetDefault() throws Exception {
@@ -17,6 +15,6 @@ public class ConstantsTest extends TestCase {
         System.out.println(classe.getField("key").getType());
 
         assertEquals(Constants.DEFAULT_I32, Constants.getDefault(classe.getField("key").getType()));
-        assertEquals(Constants.DEFAULT_STRING,Constants.getDefault(classe.getField("value").getType()));
+        assertEquals(Constants.DEFAULT_STRING, Constants.getDefault(classe.getField("value").getType()));
     }
 }
