@@ -1,5 +1,7 @@
 package org.breizhbeans.thriftui.engine.reflection.bean;
 
+import com.google.common.base.Objects;
+
 import java.util.HashMap;
 
 /**
@@ -26,49 +28,14 @@ public class ParsedThrift {
 
     @Override
     public String toString() {
-        StringBuilder result = new StringBuilder();
-
-        result.append("{namespace:");
-        if (this.namespace != null) {
-            result.append(namespace);
-        } else {
-            result.append("\'\'");
-        }
-
-        if (this.structures != null && !this.structures.isEmpty()) {
-            result.append(", structures {");
-            for (String key : this.structures.keySet()) {
-                result.append(key);
-                result.append(":");
-                result.append(this.structures.get(key).getCanonicalName());
-                result.append(",");
-            }
-            result.append("}");
-        }
-
-        if (this.services != null && !this.services.isEmpty()) {
-            result.append(", services {");
-            for (String key : this.services.keySet()) {
-                result.append(key);
-                result.append(":");
-                result.append(this.services.get(key).getCanonicalName());
-                result.append(",");
-            }
-            result.append("}");
-        }
-
-        if (this.exceptions != null && !this.exceptions.isEmpty()) {
-            result.append(", exceptions {");
-            for (String key : this.exceptions.keySet()) {
-                result.append(key);
-                result.append(":");
-                result.append(this.exceptions.get(key).getCanonicalName());
-                result.append(",");
-            }
-            result.append("}");
-        }
-
-        result.append("}");
-        return result.toString();
+        // Let's try this cool new guava helper
+        return Objects.toStringHelper(this)
+                .omitNullValues()
+                .add("namespace", namespace)
+                .add("structures", structures)
+                .add("services", services)
+                .add("exceptions", exceptions)
+                .toString();
+        // Wait, is that it ? :D
     }
 }
