@@ -24,7 +24,7 @@ import java.util.jar.JarFile;
 public class Explorer {
 
     public static void main(String[] args)
-            throws IOException, ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InstantiationException, InvocationTargetException {
+            throws IOException, ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InstantiationException, InvocationTargetException, TTransportException {
         // Open the .jar
         // Extract the thrift structures+exceptions+services
         ParsedThrift parsedThrift = ThriftAnalyzer.findClassesInJar(new JarFile(args[0]));
@@ -32,9 +32,6 @@ public class Explorer {
         // Create an dummy instance of every thrift structure found
         // and store it in a big fat map
         HashMap<String, Object> structures = getStructures(parsedThrift);
-
-        //TODO 4 : For each service, create a dummy server (for the moment it needs a server running)
-
 
         // For each service found, create a dummy client
         // and invoke their methods
@@ -66,7 +63,6 @@ public class Explorer {
                 transport.close();
             }
         }
-
 
     }
 
