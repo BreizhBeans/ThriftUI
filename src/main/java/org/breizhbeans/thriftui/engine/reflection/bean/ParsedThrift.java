@@ -28,7 +28,7 @@ public class ParsedThrift {
 
     @Override
     public String toString() {
-        // Let's try this cool new guava helper
+        // Let's try this cool guava helper
         return Objects.toStringHelper(this)
                 .omitNullValues()
                 .add("namespace", namespace)
@@ -36,6 +36,5 @@ public class ParsedThrift {
                 .add("services", services)
                 .add("exceptions", exceptions)
                 .toString();
-        // Wait, is that it ? :D
     }
 }

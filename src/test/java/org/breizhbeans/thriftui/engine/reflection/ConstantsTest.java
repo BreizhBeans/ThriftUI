@@ -1,7 +1,6 @@
-package test.org.breizhbeans.thriftui.engine.reflection;
+package org.breizhbeans.thriftui.engine.reflection;
 
 import junit.framework.TestCase;
-import org.breizhbeans.thriftui.engine.reflection.Constants;
 
 /**
  * User: Pascal.Lombard
