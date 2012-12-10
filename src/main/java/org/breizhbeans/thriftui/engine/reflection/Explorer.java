@@ -45,8 +45,8 @@ public class Explorer {
 
                 TProtocol protocol = new TBinaryProtocol(transport);
 
-                Class<?> serviceClass = parsedThrift.services.get(key);
-                TServiceClient client = getClient(serviceClass, protocol);
+                Class<TServiceClient> clientClass = parsedThrift.clients.get(key);
+                TServiceClient client = getClient(clientClass, protocol);
                 runClient(client, structures);
 
             } catch (TTransportException e) {
@@ -98,7 +98,7 @@ public class Explorer {
                     defaults[i] = structures.get(parameter.getSimpleName());
                 } else {
                     // or it is a base type
-                    defaults[i] = Constants.getDefault(parameter);
+                    defaults[i] = Constants.defaultValue(parameter);
                 }
                 // or... we're screwed with the current org.breizhbeans.thriftui.engine.reflection.Constants.getDefault().
                 // TODO : unscrew ourselves.
@@ -110,37 +110,27 @@ public class Explorer {
     }
 
     /**
-     * Mince, il n'y aurait pas un moyen plus simple et élégant de faire ça ?
+     * From a Thrift Service class, iterate on it's members until a Thrift Client is found.
      *
-     * @param serviceClass a Thrift Service Class
-     * @param protocol     an instance of a TProtocol
+     * @param clientClass a Thrift Service Class
+     * @param protocol    an instance of a TProtocol
      * @return An instance of the Client class to the Service, using the protocol
      * @throws NoSuchMethodException
      * @throws InvocationTargetException
      * @throws IllegalAccessException
      * @throws InstantiationException
      */
-    private static TServiceClient getClient(Class<?> serviceClass, TProtocol protocol)
+    private static TServiceClient getClient(Class<TServiceClient> clientClass, TProtocol protocol)
             throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, InstantiationException {
-        Class[] classes = serviceClass.getClasses();
-        TServiceClient client = null;
 
-        for (Class classe : classes) {
-            if ("Client".equalsIgnoreCase(classe.getSimpleName())) {
-                @SuppressWarnings("unchecked")
-                Constructor<TServiceClient> constructor = classe.getConstructor(protocol.getClass().getSuperclass());
-                client = constructor.newInstance(protocol);
-                break;
-            }
-        }
-
-        return client;
+        Constructor<TServiceClient> constructor = clientClass.getConstructor(protocol.getClass().getSuperclass());
+        return constructor.newInstance(protocol);
     }
 
     /**
      * Create a default instance of every structure discovered in the thrift classes
      *
-     * @param parsedThrift the container of evrything discovered in the thrift generated classes.
+     * @param parsedThrift the container of everything discovered in the thrift generated classes.
      * @return an HashMap with key = structure name and value = structure default instance.
      * @throws InstantiationException
      * @throws IllegalAccessException
@@ -154,13 +144,14 @@ public class Explorer {
         for (String key : parsedThrift.structures.keySet()) {
             Class<?> structure = parsedThrift.structures.get(key);
             // First, find the structure's fields
+            // aka the class members that implements TBase
             int arraySize = structure.getFields().length - 1; // expected number of fields, minus metadataMap
             Object[] defaults = new Object[arraySize];
             Class<?>[] constructorParameters = new Class<?>[arraySize];
             int i = 0; // let's party like it's 1994 !
             for (Field field : structure.getFields()) {
                 if (!"metaDataMap".equalsIgnoreCase(field.getName())) {
-                    defaults[i] = Constants.getDefault(field.getType());
+                    defaults[i] = Constants.defaultValue(field.getType());
                     constructorParameters[i] = field.getType();
                     i++;
                 }

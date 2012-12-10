@@ -12,8 +12,9 @@ public class ConstantsTest extends TestCase {
         Class<?> classe = Class.forName("org.breizhbeans.thriftui.storage.Row");
 
         System.out.println(classe.getField("key").getType());
+        Constants.defaultValue(classe.getField("key").getType());
 
-        assertEquals(Constants.DEFAULT_I32, Constants.getDefault(classe.getField("key").getType()));
-        assertEquals(Constants.DEFAULT_STRING, Constants.getDefault(classe.getField("value").getType()));
+        assertEquals(32, Constants.defaultValue(classe.getField("key").getType()));
+        assertEquals("DefaultString", Constants.defaultValue(classe.getField("value").getType()));
     }
 }

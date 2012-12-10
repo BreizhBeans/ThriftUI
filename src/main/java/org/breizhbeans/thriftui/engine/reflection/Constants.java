@@ -1,75 +1,37 @@
 package org.breizhbeans.thriftui.engine.reflection;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
- * Created with IntelliJ IDEA.
- * User: Pascal.Lombard
- * Date: 18/11/12
- * Time: 21:54
+ * Inspired by guava's com.google.common.base.Defaults
  */
-@SuppressWarnings({"WeakerAccess", "UnusedDeclaration", "SameReturnValue"})
 public class Constants {
 
-    public static final boolean DEFAULT_BOOL = true;
-    public static final byte DEFAULT_BYTE = 8;
-    public static final short DEFAULT_I16 = 16;
-    public static final int DEFAULT_I32 = 32;
-    public static final long DEFAULT_I64 = 64;
-    public static final double DEFAULT_DOUBLE = 64.64;
-    public static final String DEFAULT_STRING = "DefaultString";
+    private static final Map<Class<?>, Object> DEFAULTS;
 
-
-    // Those "if" conditions are pretty ugly,
-    // but I didn't manage to get a more elegant method to work.
-    public static Object getDefault(Class<?> param) {
-        if (param.getName().equalsIgnoreCase("boolean")) {
-            return DEFAULT_BOOL;
-        }
-        if (param.getName().equalsIgnoreCase("byte")) {
-            return DEFAULT_BYTE;
-        }
-        if (param.getName().equalsIgnoreCase("short")) {
-            return DEFAULT_I16;
-        }
-        if (param.getName().equalsIgnoreCase("int")) {
-            return DEFAULT_I32;
-        }
-        if (param.getName().equalsIgnoreCase("long")) {
-            return DEFAULT_I64;
-        }
-        if (param.getName().equalsIgnoreCase("double")) {
-            return DEFAULT_DOUBLE;
-        }
-        if (param.getName().equalsIgnoreCase("java.lang.String")) {
-            return DEFAULT_STRING;
-        }
-        return DEFAULT_STRING;
+    static {
+        Map<Class<?>, Object> map = new HashMap<Class<?>, Object>();
+        map.put(boolean.class, false);
+        map.put(byte.class, (byte) 8);
+        map.put(short.class, (short) 16);
+        map.put(int.class, 32);
+        map.put(long.class, 64);
+        map.put(double.class, 64.64);
+        map.put(String.class, "DefaultString");
+        DEFAULTS = Collections.unmodifiableMap(map);
     }
 
-    public static Object getDefault(String param) {
-        return DEFAULT_STRING;
-    }
-
-    public static Object getDefault(int _param) {
-        return DEFAULT_I32;
-    }
-
-    public static Object getDefault(boolean _param) {
-        return DEFAULT_BOOL;
-    }
-
-    public static Object getDefault(byte _param) {
-        return DEFAULT_BYTE;
-    }
-
-    public static Object getDefault(short _param) {
-        return DEFAULT_I16;
-    }
-
-    public static Object getDefault(long _param) {
-        return DEFAULT_I64;
-    }
-
-    public static Object getDefault(double _param) {
-        return DEFAULT_DOUBLE;
+    /**
+     * Return "default" value, as a recognizable value for base thrift types.
+     *
+     * @param type base type
+     * @param <T>  generic
+     * @return default value
+     */
+    @SuppressWarnings({"unchecked"})
+    public static <T> T defaultValue(Class<T> type) {
+        return (T) DEFAULTS.get(type);
     }
 }

@@ -1,5 +1,9 @@
 package org.breizhbeans.thriftui.engine.reflection;
 
+import com.google.common.reflect.TypeToken;
+import org.apache.thrift.TBase;
+import org.apache.thrift.TException;
+import org.apache.thrift.TServiceClient;
 import org.breizhbeans.thriftui.engine.reflection.bean.ParsedThrift;
 
 import java.util.Enumeration;
@@ -28,6 +32,7 @@ public class ThriftAnalyzer {
      * @return a ParsedThrift objectwith the services, structures and exceptions found in the jar
      * @throws ClassNotFoundException
      */
+    @SuppressWarnings({"unchecked"})
     public static ParsedThrift findClassesInJar(JarFile jar) throws ClassNotFoundException {
         ParsedThrift parsedThrift = new ParsedThrift();
 
@@ -47,21 +52,32 @@ public class ThriftAnalyzer {
                 if (parsedThrift.namespace == null) {
                     parsedThrift.namespace = classToTest.getPackage().getName();
                 }
-                // structures -> has no getStackTrace() method and a validate() method
-                // exceptions -> has a getStackTrace() method and a validate() method
-                // services -> has no validate() method
-                try {
-                    classToTest.getMethod("validate", (Class<?>[]) null);
-                } catch (NoSuchMethodException nsme) {
-                    // -> service class
-                    parsedThrift.services.put(classToTest.getSimpleName(), classToTest);
-                    continue;
-                }
-                try {
-                    classToTest.getMethod("getStackTrace", (Class<?>[]) null);
+                TypeToken<?> type = TypeToken.of(classToTest);
+
+                if (new TypeToken<TException>() {
+                }.isAssignableFrom(type)) {
+                    // exceptions -> extends TException
                     parsedThrift.exceptions.put(classToTest.getSimpleName(), classToTest);
-                } catch (NoSuchMethodException nsme) {
+                } else if (new TypeToken<TBase>() {
+                }.isAssignableFrom(type)) {
+                    // structures -> implements TBase
                     parsedThrift.structures.put(classToTest.getSimpleName(), classToTest);
+                } else {
+                    // services -> has a TServiceClient member class
+                    for (Class classMember : classToTest.getClasses()) {
+                        // Use guava's TypeToken too find wether the class
+                        // can be a Thrift Client
+                        TypeToken<?> typeOfMember = TypeToken.of(classMember);
+                        // If the type of the class can instantiate a TServiceClient -> bingo
+                        // It *should* be more reliable than just the name of the class, I hope.
+                        boolean isAssignable = new TypeToken<TServiceClient>() {
+                        }.isAssignableFrom(typeOfMember);
+                        if (isAssignable) {
+                            parsedThrift.services.put(classToTest.getSimpleName(), classToTest);
+                            parsedThrift.clients.put(classToTest.getSimpleName(), classMember);
+                        }
+                    }
+
                 }
             }
         }
