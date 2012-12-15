@@ -2,6 +2,7 @@ package org.breizhbeans.thriftui.engine.reflection;
 
 import com.google.common.reflect.TypeToken;
 import org.apache.thrift.TBase;
+import org.apache.thrift.TEnum;
 import org.apache.thrift.TException;
 import org.apache.thrift.TServiceClient;
 import org.breizhbeans.thriftui.engine.reflection.bean.ParsedThrift;
@@ -62,6 +63,10 @@ public class ThriftAnalyzer {
                 }.isAssignableFrom(type)) {
                     // structures -> implements TBase
                     parsedThrift.structures.put(classToTest.getSimpleName(), classToTest);
+                } else if (new TypeToken<TEnum>() {
+                }.isAssignableFrom(type)) {
+                    // enums -> implements Tenum
+                    parsedThrift.enums.put(classToTest.getSimpleName(), classToTest);
                 } else {
                     // services -> has a TServiceClient member class
                     for (Class classMember : classToTest.getClasses()) {

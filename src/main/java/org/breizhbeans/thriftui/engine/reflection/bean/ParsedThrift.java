@@ -11,6 +11,7 @@ import java.util.HashMap;
 public class ParsedThrift {
 
     public final HashMap<String, Class<?>> structures;
+    public final HashMap<String, Class<?>> enums;
     public final HashMap<String, Class<?>> services;
     public final HashMap<String, Class<TServiceClient>> clients;
     public final HashMap<String, Class<?>> exceptions;
@@ -18,6 +19,7 @@ public class ParsedThrift {
 
     public ParsedThrift() {
         this.structures = new HashMap<String, Class<?>>();
+        this.enums = new HashMap<String, Class<?>>();
         this.services = new HashMap<String, Class<?>>();
         this.clients = new HashMap<String, Class<TServiceClient>>();
         this.exceptions = new HashMap<String, Class<?>>();
@@ -32,6 +34,7 @@ public class ParsedThrift {
                 .omitNullValues()
                 .add("namespace", namespace)
                 .add("structures", structures)
+                .add("enums", enums)
                 .add("services", services)
                 .add("clients", clients)
                 .add("exceptions", exceptions)
